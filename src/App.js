@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { I18nextProvider } from 'react-i18next';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import i18n from './i18n';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -11,6 +11,7 @@ import HowItWorks from './components/HowItWorks';
 import FAQ from './components/FAQ';
 import Footer from './components/Footer';
 import ImageUploader from './components/ImageUploader';
+import { trackPageView } from './utils/analytics';
 
 const theme = createTheme({
   palette: {
@@ -104,7 +105,8 @@ const theme = createTheme({
   },
 });
 
-function App() {
+function AppContent() {
+  const location = useLocation();
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
@@ -124,31 +126,42 @@ function App() {
     ]
   };
 
+  useEffect(() => {
+    // 追踪页面访问
+    trackPageView(location.pathname);
+  }, [location]);
+
+  return (
+    <div className="App">
+      <script type="application/ld+json">
+        {JSON.stringify(jsonLd)}
+      </script>
+      <Header />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <main>
+              <Hero />
+              <ImageUploader />
+              <Features />
+              <HowItWorks />
+              <FAQ />
+            </main>
+          }
+        />
+      </Routes>
+      <Footer />
+    </div>
+  );
+}
+
+function App() {
   return (
     <I18nextProvider i18n={i18n}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <div className="App">
-          <script type="application/ld+json">
-            {JSON.stringify(jsonLd)}
-          </script>
-          <Header />
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <main>
-                  <Hero />
-                  <ImageUploader />
-                  <Features />
-                  <HowItWorks />
-                  <FAQ />
-                </main>
-              }
-            />
-          </Routes>
-          <Footer />
-        </div>
+        <AppContent />
       </ThemeProvider>
     </I18nextProvider>
   );

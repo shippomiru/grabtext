@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -16,6 +16,15 @@ import {
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { createWorker } from 'tesseract.js';
+import {
+  trackButtonClick,
+  trackFileUpload,
+  trackTextExtraction,
+  trackTextCopy,
+  trackClear,
+  trackSessionComplete,
+  trackMultipleOperations
+} from '../utils/analytics';
 
 const ImageUploader = () => {
   const { t } = useTranslation();
@@ -25,9 +34,20 @@ const ImageUploader = () => {
   const [extractProgress, setExtractProgress] = useState(0);
   const [extractedText, setExtractedText] = useState('');
   const [isExtracting, setIsExtracting] = useState(false);
+  const [sessionStartTime, setSessionStartTime] = useState(null);
+  const [operationCount, setOperationCount] = useState(0);
+
+  // 追踪文件上传
+  useEffect(() => {
+    if (files.length > 0) {
+      const fileTypes = files.map(file => file.type);
+      trackFileUpload(files.length, fileTypes);
+    }
+  }, [files]);
 
   const handleFileChange = (event) => {
     if (isExtracting || extractedText) return;
+    trackButtonClick('upload_button');
     const selectedFiles = Array.from(event.target.files);
     const validFiles = selectedFiles.filter(file => {
       const isValid = ['image/png', 'image/jpeg', 'image/jpg'].includes(file.type);
@@ -88,6 +108,12 @@ const ImageUploader = () => {
 
   const handleExtract = async () => {
     if (files.length === 0) return;
+    trackButtonClick('extract_button');
+    
+    // 记录会话开始时间
+    if (!sessionStartTime) {
+      setSessionStartTime(Date.now());
+    }
 
     setIsExtracting(true);
     setExtractProgress(0);
@@ -177,8 +203,10 @@ const ImageUploader = () => {
 
         // 每处理完一个文件就更新一次状态
         setExtractedText(allText.trim());
+        trackTextExtraction(true);
       } catch (error) {
         console.error('Error extracting text:', error);
+        trackTextExtraction(false, error.message);
       }
 
       URL.revokeObjectURL(imageUrl);
@@ -197,19 +225,33 @@ const ImageUploader = () => {
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(extractedText);
+    trackButtonClick('copy_button');
+    navigator.clipboard.writeText(extractedText)
+      .then(() => {
+        trackTextCopy(true);
+        // 如果这是第一次复制，记录会话完成
+        if (sessionStartTime && operationCount === 0) {
+          const duration = (Date.now() - sessionStartTime) / 1000; // 转换为秒
+          trackSessionComplete(duration);
+          setOperationCount(prev => prev + 1);
+        } else {
+          // 如果是多次操作，记录多次操作事件
+          trackMultipleOperations(operationCount + 1);
+          setOperationCount(prev => prev + 1);
+        }
+      })
+      .catch(() => {
+        trackTextCopy(false);
+      });
   };
 
   const handleClear = () => {
+    trackButtonClick('clear_button');
+    trackClear();
     setFiles([]);
     setExtractedText('');
-    setExtractProgress(0);
-    setIsExtracting(false);
-    // 重置文件输入框
-    const fileInput = document.getElementById('fileInput');
-    if (fileInput) {
-      fileInput.value = '';
-    }
+    setSessionStartTime(null);
+    setOperationCount(0);
   };
 
   return (
