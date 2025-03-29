@@ -10,7 +10,7 @@ import {
 import { useTranslation } from 'react-i18next';
 
 const Footer = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const theme = useTheme();
 
   const handleScroll = (elementId) => {
@@ -19,6 +19,11 @@ const Footer = () => {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  // 根据语言选择反馈链接
+  const feedbackLink = i18n.language === 'zh' 
+    ? 'https://khwde0rk62.feishu.cn/share/base/form/shrcn1wy6IjkQ3yjgBwBUJ5048c'
+    : 'https://khwde0rk62.feishu.cn/share/base/form/shrcnMgV33I3F7vAnKDaaF0faXc';
 
   return (
     <Box
@@ -120,9 +125,19 @@ const Footer = () => {
               <Typography variant="h6" gutterBottom align="left">
                 {t('footer.contact')}
               </Typography>
-              <Typography variant="body2" color="text.secondary" align="left">
+              <Typography variant="body2" color="text.secondary" align="left" sx={{ mb: 1 }}>
                 {t('footer.address')}
               </Typography>
+              <Link
+                href={feedbackLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="body2"
+                color="text.secondary"
+                sx={{ textDecoration: 'none' }}
+              >
+                {t('footer.contactLink')}
+              </Link>
             </Box>
           </Grid>
         </Grid>
