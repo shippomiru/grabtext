@@ -110,7 +110,7 @@ function AppContent() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "Extract Text from Images",
+    "name": "Extract Text from Image",
     "applicationCategory": "Utility",
     "operatingSystem": "Web Browser",
     "offers": {
