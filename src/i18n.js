@@ -150,8 +150,8 @@ const resources = {
         language: 'Language',
       },
       hero: {
-        title: 'Extract Text from Images',
-        subtitle: 'A powerful tool to extract text from pictures and screenshots. Upload multiple images and get all text content with one click.',
+        title: 'Extract Text from Image',
+        subtitle: 'A powerful tool to extract text from pictures and images. Upload multiple images and get all text content with one click.',
         cta: 'Start Extracting Text',
       },
       uploader: {
