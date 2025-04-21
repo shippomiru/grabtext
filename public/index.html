@@ -36,5 +36,18 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    
+    <!-- Ko-fi 打赏组件 -->
+    <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+    <script>
+      kofiWidgetOverlay.draw('shipporun', {
+        'type': 'floating-chat',
+        'floating-chat.donateButton.text': 'Tip me',
+        'floating-chat.donateButton.background-color': '#0A84FF',
+        'floating-chat.donateButton.text-color': '#fff',
+        'floating-chat.corner.bottom': '20',
+        'floating-chat.corner.right': '20'
+      });
+    </script>
   </body>
 </html> 
