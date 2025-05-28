@@ -11,7 +11,7 @@ import HowItWorks from './components/HowItWorks';
 import FAQ from './components/FAQ';
 import Footer from './components/Footer';
 import ImageUploader from './components/ImageUploader';
-import { trackPageView } from './utils/analytics';
+import { trackPageView, initializeAnalytics } from './utils/analytics';
 
 const theme = createTheme({
   palette: {
@@ -125,6 +125,15 @@ function AppContent() {
       "Original formatting preservation"
     ]
   };
+
+  useEffect(() => {
+    // 初始化分析工具
+    const timer = setTimeout(() => {
+      initializeAnalytics();
+    }, 1000); // 延迟1秒确保脚本加载完成
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     // 追踪页面访问
